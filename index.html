@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Student Daily Reports</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+
+  <link rel="stylesheet" href="Contact-us.css" >
+
+</head>
+
+<body>
+  <div class="background-image-overlay">
+    <a href="News-page.html">Biomatric Attendance</a>
+    </div>
+    
+    <div class="container-biomatric-one">
+      <h3>The unique physical
+        features of employees</h3>
+
+      <div class="subtract-line">
+        <img class="icon" src="image\graduation-cap.png" alt="Icon">
+
+      </div>
+
+     <img src="image\biometric-icon-01-1.png" class="img-fuild">
+    
+    <form id="reportForm">
+      <div class="form-group">
+        <label for="studentName">Student Name</label>
+        <input type="text" class="form-control" id="studentName" required>
+        
+      </div>
+      <div class="form-group">
+        <label for="department">Department</label>
+        <input type="text" class="form-control" id="department" required>
+      </div>
+      <div class="form-group">
+        <label for="shift">Shift</label>
+        <input type="text" class="form-control" id="shift" required>
+      </div>
+      <div class="form-group">
+        <label for="inTime">In Time</label>
+        <input type="text" class="form-control" id="inTime" required>
+      </div>
+      <div class="form-group">
+        <label for="outTime">Out Time</label>
+        <input type="text" class="form-control" id="outTime" required>
+      </div>
+      <div class="form-group">
+        <label for="totalTime">Total Time</label>
+        <input type="text" class="form-control" id="totalTime" required>
+      </div>
+      <div class="form-group">
+        <label for="attendance">Attendance</label>
+        <input type="text" class="form-control" id="attendance" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Submit Report</button>
+     
+    </form>
+    <hr>
+    <h2>Reports</h2>
+    <table class="table table-striped" id="reportTable">
+      <thead>
+        <tr>
+          <th>Select</th>
+          <th>Student Name</th>
+          <th>Department</th>
+          <th>Shift</th>
+          <th>In Time</th>
+          <th>Out Time</th>
+          <th>Total Time</th>
+          <th>Attendance</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+    <div class="mt-4">
+      <button id="exportPdfBtn" class="btn btn-success">Export as PDF</button>
+      <button id="exportExcelBtn" class="btn btn-success">Export as Excel</button>
+      <button id="clearReportsBtn" class="btn btn-danger">Clear Selected Reports</button>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.debug.js"></script>
+  <script src="https://unpkg.com/xlsx/dist/xlsx.full.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      // Student reports array
+      var studentReports = [];
+
+      // Handle form submission
+      $('#reportForm').submit(function(event) {
+        event.preventDefault();
+
+        // Get form values
+        var studentName = $('#studentName').val();
+        var department = $('#department').val();
+        var shift = $('#shift').val();
+        var inTime = $('#inTime').val();
+        var outTime = $('#outTime').val();
+        var totalTime = $('#totalTime').val();
+        var attendance = $('#attendance').val();
+
+        // Add the report to the array
+        studentReports.push({
+          name: studentName,
+          department: department,
+          shift: shift,
+          inTime: inTime,
+          outTime: outTime,
+          totalTime: totalTime,
+          attendance: attendance
+        });
+
+        // Append a new row to the table
+        $('#reportTable tbody').append(
+          '<tr>' +
+          '<td><input type="checkbox" class="report-checkbox" data-name="' + studentName + '"></td>' +
+          '<td>' + studentName + '</td>' +
+          '<td>' + department + '</td>' +
+          '<td>' + shift + '</td>' +
+          '<td>' + inTime + '</td>' +
+          '<td>' + outTime + '</td>' +
+          '<td>' + totalTime + '</td>' +
+          '<td>' + attendance + '</td>' +
+          '</tr>'
+        );
+
+        // Reset form fields
+        $('#studentName').val('');
+        $('#department').val('');
+        $('#shift').val('');
+        $('#inTime').val('');
+        $('#outTime').val('');
+        $('#totalTime').val('');
+        $('#attendance').val('');
+      });
+
+      // Export as PDF
+      $('#exportPdfBtn').click(function() {
+        var selectedReports = getSelectedReports();
+
+        if (selectedReports.length === 0) {
+          alert('No reports selected.');
+          return;
+        }
+
+        var doc = new jsPDF();
+        doc.setFontSize(18);
+        doc.text('Student Daily Reports', 10, 10);
+        doc.setFontSize(12);
+
+        var y = 20;
+        $.each(selectedReports, function(index, report) {
+          doc.text(10, y + 10, 'Student Name: ' + report.name);
+          doc.text(10, y + 20, 'Department: ' + report.department);
+          doc.text(10, y + 30, 'Shift: ' + report.shift);
+          doc.text(10, y + 40, 'In Time: ' + report.inTime);
+          doc.text(10, y + 50, 'Out Time: ' + report.outTime);
+          doc.text(10, y + 60, 'Total Time: ' + report.totalTime);
+          doc.text(10, y + 70, 'Attendance: ' + report.attendance);
+          y += 90;
+        });
+
+        doc.save('student_reports.pdf');
+      });
+
+      // Export as Excel
+      $('#exportExcelBtn').click(function() {
+        var selectedReports = getSelectedReports();
+
+        if (selectedReports.length === 0) {
+          alert('No reports selected.');
+          return;
+        }
+
+        var worksheet = XLSX.utils.json_to_sheet(selectedReports);
+        var workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'Student Reports');
+        XLSX.writeFile(workbook, 'student_reports.xlsx');
+      });
+
+      // Clear Selected Reports
+      $('#clearReportsBtn').click(function() {
+        var selectedReports = getSelectedReports();
+
+        if (selectedReports.length === 0) {
+          alert('No reports selected.');
+          return;
+        }
+
+        $.each(selectedReports, function(index, report) {
+          // Remove the report from the array
+          studentReports = studentReports.filter(function(item) {
+            return item.name !== report.name;
+          });
+
+          // Remove the row from the table
+          $('input.report-checkbox[data-name="' + report.name + '"]').closest('tr').remove();
+        });
+      });
+
+      // Get the selected reports
+      function getSelectedReports() {
+        var selectedReports = [];
+
+        $('input.report-checkbox:checked').each(function() {
+          var name = $(this).data('name');
+
+          var report = studentReports.find(function(item) {
+            return item.name === name;
+          });
+
+          if (report) {
+            selectedReports.push(report);
+          }
+        });
+
+        return selectedReports;
+      }
+    });
+  </script>
+</body>
+</html>
