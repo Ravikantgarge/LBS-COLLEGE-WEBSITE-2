@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>PDF File Upload</title>
+  <style>
+    /* Styling for file upload section */
+    .upload-container {
+      margin-bottom: 20px;
+    }
+
+    .file-list {
+      list-style-type: none;
+      padding: 0;
+    }
+
+    .file-item {
+      margin-bottom: 5px;
+    }
+
+    /* Styling for print button */
+    .print-button {
+      display: inline-block;
+      padding: 10px 15px;
+      background-color: #4caf50;
+      color: white;
+      text-decoration: none;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="upload-container">
+    <h2>Upload PDF Files</h2>
+    <input type="file" id="pdf-file" multiple>
+    <ul id="file-list" class="file-list"></ul>
+  </div>
+
+  <button class="print-button" onclick="printSelectedFiles()">Print Selected Files</button>
+
+  <script>
+    function printSelectedFiles() {
+      var checkboxes = document.querySelectorAll('input[type="checkbox"]:checked');
+      var filesToPrint = [];
+
+      checkboxes.forEach(function(checkbox) {
+        var fileItem = checkbox.parentNode;
+        var fileName = fileItem.getAttribute('data-file-name');
+        filesToPrint.push(fileName);
+      });
+
+      if (filesToPrint.length > 0) {
+        // Print logic, e.g., open a new window and print the files
+        console.log('Printing files:', filesToPrint);
+      } else {
+        console.log('No files selected for printing.');
+      }
+    }
+
+    function handleFileSelect(event) {
+      var fileList = event.target.files;
+      var fileListElement = document.getElementById('file-list');
+
+      fileListElement.innerHTML = '';
+
+      for (var i = 0; i < fileList.length; i++) {
+        var file = fileList[i];
+
+        var fileItem = document.createElement('li');
+        fileItem.className = 'file-item';
+        fileItem.setAttribute('data-file-name', file.name);
+
+        var checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+
+        var fileName = document.createElement('span');
+        fileName.innerText = file.name;
+
+        fileItem.appendChild(checkbox);
+        fileItem.appendChild(fileName);
+        fileListElement.appendChild(fileItem);
+      }
+    }
+
+    document.getElementById('pdf-file').addEventListener('change', handleFileSelect);
+  </script>
+</body>
+</html>
